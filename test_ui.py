@@ -40,13 +40,12 @@ def test_search_movie(browser):
         browser.get(BASE_URL)
 
     with allure.step("Найти поле поиска и ввести запрос"):
-        search = get_search_input(browser)  # здесь ждем поле поиска
+        search = get_search_input(browser)
         search.clear()
         search.send_keys("Интерстеллар")
         search.submit()
 
     with allure.step("Дождаться результатов поиска"):
-        # Ждем изменения URL, а не просто body
         WebDriverWait(browser, 10).until(
             lambda driver: "search" in driver.current_url.lower()
         )
@@ -61,7 +60,6 @@ def test_navigate_to_popular_movie(browser):
         browser.get(BASE_URL)
 
     with allure.step("Найти ссылку на фильм через JS"):
-        # Ждем, пока появится хотя бы одна ссылка на фильм
         movie_link = WebDriverWait(browser, 10).until(
             lambda driver: driver.execute_script("""
                 var links = document.querySelectorAll('a[href*="/film/"]');
@@ -81,7 +79,6 @@ def test_navigate_to_popular_movie(browser):
         click_js(browser, movie_link)
 
     with allure.step("Дождаться загрузки страницы фильма"):
-        # Ждем изменения URL
         WebDriverWait(browser, 10).until(
             lambda driver: "film" in driver.current_url.lower()
         )
@@ -101,7 +98,6 @@ def test_movie_card_rating(browser):
                 var elements = document.querySelectorAll('*');
                 for (var i = 0; i < elements.length; i++) {
                     var text = elements[i].textContent.trim();
-                    // Ищем текст похожий на рейтинг (число с точкой)
                     if (text && /^\\d+[.,]\\d+$/.test(text)) {
                         return text;
                     }
@@ -112,15 +108,19 @@ def test_movie_card_rating(browser):
 
     with allure.step("Проверить, что рейтинг найден"):
         assert rating_text is not None
-        # Парсим число
         rating_value = float(rating_text.replace(',', '.'))
         assert rating_value > 0
+
+
+@pytest.mark.ui
+@allure.title("Поиск фильма по актеру")
+@allure.story("UI: Поиск")
 def test_search_by_actor(browser):
     with allure.step("Открыть главную страницу"):
         browser.get(BASE_URL)
 
     with allure.step("Найти поле поиска и ввести имя актера"):
-        search = get_search_input(browser)  # ждем поле поиска
+        search = get_search_input(browser)
         search.clear()
         search.send_keys("Леонардо ДиКаприо")
         search.submit()
@@ -140,7 +140,7 @@ def test_search_by_genre(browser):
         browser.get(BASE_URL)
 
     with allure.step("Найти поле поиска и ввести жанр"):
-        search = get_search_input(browser)  # ждем поле поиска
+        search = get_search_input(browser)
         search.clear()
         search.send_keys("комедия")
         search.submit()
